@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Requests</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            background-color: #003366;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            font-size: 1.1rem;
+        }
+
+        .navbar a:hover {
+            background-color: #ffc814;
+            color: #003366;
+        }
+
+        /* Main Heading Styling */
+        h1 {
+            color: #003366;
+            text-align: center;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-top: 20px;
+        }
+
+        /* Table Styling */
+        .table {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: #01508c;
+            color: white;
+            font-size: 1.1rem;
+            padding: 15px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Button Styling */
+        .btn-view-details {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            padding: 8px 16px;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-view-details:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<div class="navbar">
+    <a href="{% url 'manager_dashboard' %}">Dashboard</a>
+    <a href="{% url 'approve_requests' %}">Approve Requests</a>
+    <a href="{% url 'approved_requests' %}">Approved Requests</a>
+    <a href="{% url 'rejected_requests' %}">Rejected Requests</a>
+    <a href="{% url 'logout' %}">Logout</a>
+</div>
+
+<div class="container">
+    <h1>Approve Requests</h1>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Ticket Number</th>
+                <th>Employee</th>
+                <th>Vendor Name</th>
+                <th>Vendor Code</th>
+                <th>Invoice Date</th>
+                <th>Requested Payment Date</th>
+                <th>Notes</th>
+                <th>Is Urgent</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.ticket_number }}</td>
+                <td>{{ request.employee.username }}</td>
+                <td>{{ request.vendor_name }}</td>
+                <td>{{ request.vendor_code }}</td>
+                <td>{{ request.invoice_date }}</td>
+                <td>{{ request.requested_date_of_payment }}</td>
+                <td>{{ request.notes }}</td>
+                <td>{% if request.is_urgent %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <button type="button" class="btn btn-view-details" data-bs-toggle="modal" data-bs-target="#requestModal"
+                        onclick="setModalData('{{ request.ticket_number }}', '{{ request.vendor_name }}', '{{ request.employee.username }}', '{{ request.invoice_amount }}', '{{ request.id }}')">
+                        Review
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9">No pending requests.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for Approving or Rejecting a Request -->
+<div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="requestModalLabel">Approve/Reject Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'approve_reject_request' 0 %}" id="modalForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p><strong>Ticket Number:</strong> <span id="ticketNumber"></span></p>
+                    <p><strong>Vendor Name:</strong> <span id="vendorName"></span></p>
+                    <p><strong>Employee:</strong> <span id="employeeName"></span></p>
+                    <p><strong>Invoice Amount:</strong> $<span id="invoiceAmount"></span></p>
+                    <textarea name="manager_note" rows="4" placeholder="Add your approval/rejection note"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="action" value="Approved" class="btn btn-success">Approve</button>
+                    <button type="submit" name="action" value="Rejected" class="btn btn-danger">Reject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function setModalData(ticketNumber, vendorName, employeeName, invoiceAmount, requestId) {
+        document.getElementById('ticketNumber').innerText = ticketNumber;
+        document.getElementById('vendorName').innerText = vendorName;
+        document.getElementById('employeeName').innerText = employeeName;
+        document.getElementById('invoiceAmount').innerText = invoiceAmount;
+
+        // Update form action with the correct request ID
+        document.getElementById('modalForm').action = "{% url 'approve_reject_request' 0 %}".replace(0, requestId);
+    }
+</script>
+
+</body>
+</html>

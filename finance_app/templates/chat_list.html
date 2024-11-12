@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Load static files -->
+    {% load static %}
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Header styling */
+        .header {
+            background-color: #1d7575;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 100%;
+            position: absolute;
+            top: 0;
+        }
+
+        /* Container for the chat list */
+        .chat-list-container {
+            max-width: 1200px; /* Increased container size significantly */
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            padding: 40px; /* Increased padding */
+        }
+
+        /* Styling for the GIF */
+        .gif-container {
+            margin-right: 30px; /* Added more margin for spacing */
+            flex-shrink: 0;
+        }
+
+        .gif-container img {
+            max-width: 200px; /* Increased size of the GIF */
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* Styling each chat item */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px; /* Increased padding for chat items */
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Remove hover effect on chat items */
+        .chat-item:hover {
+            background-color: white; /* Keeping background color same */
+            box-shadow: none; /* No shadow change */
+        }
+
+        .chat-item img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-info h4 {
+            margin: 0;
+            font-size: 1.2rem; /* Slightly increased text size */
+            color: #333;
+        }
+
+        .chat-info p {
+            margin: 5px 0 0;
+            font-size: 1rem; /* Increased font size */
+            color: #888;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1d7575;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .chat-list-container {
+                flex-direction: column;
+                align-items: center;
+                max-width: 100%; /* Allow full width on mobile */
+            }
+
+            .gif-container {
+                margin-bottom: 20px;
+            }
+
+            .gif-container img {
+                max-width: 80%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        Chat with
+    </div>
+
+    <!-- Chat list container -->
+    <div class="chat-list-container">
+        <!-- GIF Container on the left side -->
+        <div class="gif-container">
+            <img src="{% static 'finance_app/images/conversation.gif' %}" alt="Conversation GIF">
+        </div>
+
+        <!-- Chat list starts here -->
+        <div>
+            {% for user in users %}
+            <div class="chat-item" onclick="window.location.href='{% url 'chat_detail' user.id %}'">
+                <!-- Placeholder for user profile picture -->
+                <img src="https://via.placeholder.com/55" alt="Profile Picture">
+                <div class="chat-info">
+                    <h4>{{ user.username }}</h4>
+                    <p>Last message preview...</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Powered by Finconnect
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Details</title>
+</head>
+<body>
+    <h1>Vendor Details</h1>
+    <p><strong>Name:</strong> {{ vendor.vendor_name }}</p>
+    <p><strong>ID:</strong> {{ vendor.vendor_id }}</p>
+    <p><strong>Added by:</strong> {{ vendor.added_by.username }}</p>
+    <p><strong>Document:</strong> <a href="{{ vendor.document.url }}">Download Document</a></p>
+
+    <a href="{% url 'vendor_list' %}">Back to Vendor List</a>
+</body>
+</html>

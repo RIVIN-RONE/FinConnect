@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor List</title>
+</head>
+<body>
+    <h1>Vendor List</h1>
+    <ul>
+        {% for vendor in vendors %}
+            <li>
+                {{ vendor.vendor_name }} (ID: {{ vendor.vendor_id }}) 
+                <a href="{% url 'vendor_detail' vendor.id %}">View Details</a> | 
+                <a href="{% url 'edit_vendor' vendor.id %}">Edit Vendor</a>
+            </li>
+        {% empty %}
+            <li>No vendors found.</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'finance_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>
+

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ other_user.username }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e5ddd5;
+            display: flex;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 260px;
+            background-color: #1d7575;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #ffc814;
+            color: #003366;
+        }
+
+        .sidebar hr {
+            border-color: white;
+        }
+
+        .content {
+            margin-left: 280px;
+            padding: 40px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Chatbox styling */
+        .chat-box {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .chat-bubble {
+            max-width: 60%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .chat-bubble .timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+        }
+
+        .chat-bubble.sent {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+
+        .chat-bubble.received {
+            background-color: white;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: none;
+            background-color: #fff;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input button {
+            background-color: #25d366;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-input button:hover {
+            background-color: #128c7e;
+        }
+
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>FinConnect</h2>
+
+        <!-- Conditionally render sidebar options based on the user's role -->
+        {% if user_role == 'Employee' %}
+        <a href="{% url 'employee_dashboard' %}"><i class="bi bi-house"></i> Dashboard</a>
+        <a href="{% url 'add_request' %}"><i class="bi bi-file-earmark-plus"></i> Add Request</a>
+        <a href="{% url 'add_vendor' %}"><i class="bi bi-person-plus"></i> Add Vendor</a>
+        <a href="{% url 'view_status' %}"><i class="bi bi-file-earmark"></i> View Status</a>
+        <a href="{% url 'chat_list' %}"><i class="bi bi-chat"></i> Chat</a>
+
+        {% elif user_role == 'Manager' %}
+        <a href="{% url 'manager_dashboard' %}"><i class="bi bi-speedometer2"></i> Manager Dashboard</a>
+        <a href="{% url 'approve_requests' %}"><i class="bi bi-check-circle"></i> Approve Requests</a>
+        <a href="{% url 'approved_requests' %}"><i class="bi bi-file-earmark-check"></i> Approved Requests</a>
+        <a href="{% url 'rejected_requests' %}"><i class="bi bi-x-circle"></i> Rejected Requests</a>
+        <a href="{% url 'chat_list' %}"><i class="bi bi-chat"></i> Chat</a>
+
+        {% elif user_role == 'Finance' %}
+        <a href="{% url 'finance_dashboard' %}"><i class="bi bi-wallet"></i> Finance Dashboard</a>
+        <a href="{% url 'view_payments' %}"><i class="bi bi-file-earmark-text"></i> View Payments</a>
+        <a href="{% url 'report' %}"><i class="bi bi-graph-up"></i> Reports</a>
+        <a href="{% url 'chat_list' %}"><i class="bi bi-chat"></i> Chat</a>
+
+        {% endif %}
+        <hr>
+        <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h1>Chat with {{ other_user.username }}</h1>
+
+        <div id="chat-box" class="chat-box">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="chat-bubble {% if message.sender.id == user.id %}sent{% else %}received{% endif %}">
+                        <p><strong>{{ message.sender.username }}:</strong> {{ message.text }}</p>
+                        <div class="timestamp">{{ message.timestamp|date:"H:i" }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No messages yet.</p>
+            {% endif %}
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Type a message...">
+            <button id="send-button">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const messageInput = document.querySelector('#message-input');
+        const sendButton = document.querySelector('#send-button');
+        const chatBox = document.querySelector('#chat-box');
+        const receiverId = {{ other_user.id }};
+        
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            
+            if (message) {
+                fetch('/chat/send/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        'message': message,
+                        'receiver_id': receiverId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        chatBox.innerHTML += `<div class="chat-bubble sent"><p><strong>You:</strong> ${message}</p><div class="timestamp">Now</div></div>`;
+                        messageInput.value = '';
+                    } else {
+                        alert('Failed to send the message!');
+                    }
+                })
+                .catch(error => {
+                    alert('Failed to send the message!');
+                });
+            } else {
+                alert('Please enter a message!');
+            }
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

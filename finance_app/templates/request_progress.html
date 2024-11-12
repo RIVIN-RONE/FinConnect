@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Progress Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .tracker-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2980b9;
+            margin-bottom: 40px;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .progress::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #ccc;
+            z-index: 0;
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .step.completed {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+        }
+
+        .step.pending {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+        }
+
+        .step-text {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* Footer style */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="tracker-container">
+        <h1>Request Progress Tracker</h1>
+
+        <div class="progress">
+            <div class="step {% if request.status == 'Manager Approved' or request.status == 'Finance Pending' or request.status == 'Closed' %}completed{% endif %}">
+                <span>✓</span>
+            </div>
+            <p class="step-text">Manager</p>
+
+            <div class="step {% if request.status == 'Finance Pending' or request.status == 'Closed' %}pending{% endif %}">
+                <span>...</span>
+            </div>
+            <p class="step-text">Finance</p>
+
+            <div class="step {% if request.status == 'Closed' %}completed{% endif %}">
+                <span>✓</span>
+            </div>
+            <p class="step-text">Closed</p>
+        </div>
+    </div>
+
+    <footer>
+        Copyright © 2024 All rights reserved with Learnfluence Education Private Limited
+    </footer>
+</body>
+</html>
